@@ -1,14 +1,13 @@
-from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-import os
-import logging
+import os, logging
+from api.mock_calendly import router as calendly_router
 
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 app = FastAPI(
     title="Appointment Scheduling Agent",
@@ -16,6 +15,7 @@ app = FastAPI(
     description="Advanced AI-powered codebase analysis using Groq LLMs"
 )
 
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,6 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+app.include_router(calendly_router)
 
 @app.get("/")
 async def root():
@@ -34,12 +36,11 @@ async def root():
     }
 
 @app.get("/health")
-async def hepalth_check():
+async def health_check():
     return {
         "status": "healthy",
         "service": "Codebase AI Analyst",
     }
-
 
 if __name__ == "__main__":
     import uvicorn
